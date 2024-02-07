@@ -5,6 +5,10 @@ import { useEffect } from "react";
 
 const useMovieTrailer = (movieId)=>{
     const dispatch = useDispatch();
+    const trailer = useSelector(store=>store.movies.trailerVideo);
+    useEffect(() => {
+      !trailer && getMovieBackground();
+    }, []);
     const getMovieBackground = async () => {
         const data = await fetch(
           "https://api.themoviedb.org/3/movie/" + movieId + "/videos",
@@ -15,9 +19,7 @@ const useMovieTrailer = (movieId)=>{
         const trailer = filterData.length === 0 ? filterData[0] : json.results[0];
         dispatch(addTrailerVideo(trailer));
       };
-      useEffect(() => {
-        getMovieBackground();
-      }, []);
+      
     
 }
 

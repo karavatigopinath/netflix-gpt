@@ -4,12 +4,16 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
+import { toggleGPTSearch } from "../utils/GPTSlice";
+import { SUPPORTED_LANGUAGES } from "../constants";
+import { changeLanguage } from "../utils/configSlice";
 
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-
+  const showGPTSearch = useSelector(store=>store.showGPTSearch.showGPTSearch);
+  
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -35,15 +39,31 @@ const Header = () => {
         navigate("/error");
       });
   };
+  const handleGPTSearch = ()=>{
+    dispatch(toggleGPTSearch())
+  }
+  const chooseLang = (e)=>{
+     dispatch(changeLanguage(e.target.value));
+  }
   return (
-    <div className="absolute w-full px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between">
+    <div className="absolute w-full md:px-8 px-0 md:py-2 bg-gradient-to-b from-black z-10 justify-between
+      flex flex-col md:flex-row">
       <img
-        className="w-40"
+        className="w-40 mx-auto md:mx-0"
         src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
         alt="netflix logo"
       />
       {user && (
-        <div className="flex">
+        <div className="flex p-2">
+         {showGPTSearch && <select onChange={chooseLang} className="p-2 m-2 text-white bg-gray-800">
+          {
+            SUPPORTED_LANGUAGES.map(language=><option key={language.identifier} value={language.identifier}>{language.name}</option>)
+          }
+          </select>}
+          
+        <button onClick={handleGPTSearch} className="bg-purple-800 text-white mx-4 px-4 py-0 my-2 rounded-lg">
+        { showGPTSearch ? "Homepage" : "GPT Search"}
+        </button>
           <img
             className="w-10 h-10 m-2 rounded-lg my-3"
             alt="UImg"
